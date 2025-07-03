@@ -1,12 +1,13 @@
-import { Track } from "@/assets/data/Track";
+
 import { unknownTracksImageUri } from "@/constants/images";
 import { colors, fontSize } from "@/constants/tokens";
 import { defaultStyles } from "@/styles";
-import React from "react"
-import { Image, TouchableHighlight, View, StyleSheet, Text } from "react-native"
+import React from "react";
+import { Image, StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import { Track } from "react-native-track-player";
 
 export type Props = {
-    tracks: Track[];
+    tracks: Track;
 }
 
 export const TracksListItem = ({ tracks }: Props) => {
@@ -17,7 +18,7 @@ export const TracksListItem = ({ tracks }: Props) => {
                 <View>
                     <Image
                         source={{
-                            uri: tracks[0].artwork ?? unknownTracksImageUri,
+                            uri: tracks.artwork ?? unknownTracksImageUri,
                         }}
                         style={{
                             ...styles.trackArtworkImage,
@@ -32,13 +33,13 @@ export const TracksListItem = ({ tracks }: Props) => {
                             ...styles.trackTitleText,
                             color: isActiveTrack ? colors.primary : colors.text,
                         }}>
-                        {tracks[0].title}
+                        {tracks.title}
                     </Text>
-                    {tracks[0].artist && (
+                    {tracks.artist && (
                         <Text
                             numberOfLines={1}
                             style={styles.trackArtistText}>
-                            {tracks[0].artist}
+                            {tracks.artist}
                         </Text>
                     )}
                 </View>
