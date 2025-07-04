@@ -2,18 +2,20 @@
 import { unknownTracksImageUri } from "@/constants/images";
 import { colors, fontSize } from "@/constants/tokens";
 import { defaultStyles } from "@/styles";
+import { Entypo } from "@expo/vector-icons";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableHighlight, View } from "react-native";
-import { Track } from "react-native-track-player";
+import { Track, useActiveTrack } from "react-native-track-player";
 
 export type Props = {
     tracks: Track;
+    onTrackSelected: (tracks: Track) => void;
 }
 
-export const TracksListItem = ({ tracks }: Props) => {
-    const isActiveTrack = false;
+export const TracksListItem = ({ tracks, onTrackSelected: handleTrackSelect }: Props) => {
+    const isActiveTrack = useActiveTrack()?.url === tracks.url;
     return (
-        <TouchableHighlight>
+        <TouchableHighlight onPress={() => handleTrackSelect(tracks)}>
             <View style={styles.trackItemContainer}>
                 <View>
                     <Image
@@ -26,26 +28,31 @@ export const TracksListItem = ({ tracks }: Props) => {
                         }}
                     />
                 </View>
-                <View style={{ width: '100%' }}>
-                    <Text
-                        numberOfLines={1}
-                        style={{
-                            ...styles.trackTitleText,
-                            color: isActiveTrack ? colors.primary : colors.text,
-                        }}>
-                        {tracks.title}
-                    </Text>
-                    {tracks.artist && (
+                <View style={styles.trackMenu}>
+                    <View style={{ width: '100%' }}>
                         <Text
                             numberOfLines={1}
-                            style={styles.trackArtistText}>
-                            {tracks.artist}
+                            style={{
+                                ...styles.trackTitleText,
+                                color: isActiveTrack ? colors.primary : colors.text,
+                            }}>
+                            {tracks.title}
                         </Text>
-                    )}
+                        {tracks.artist && (
+                            <Text
+                                numberOfLines={1}
+                                style={styles.trackArtistText}>
+                                {tracks.artist}
+                            </Text>
+                        )}
+                    </View>
+
+                    <Entypo name="dots-three-horizontal" size={18} color={colors.icon} />
                 </View>
+
             </View>
         </TouchableHighlight>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
@@ -66,10 +73,16 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginTop: 4,
     },
-    trackItemContainer:{
+    trackItemContainer: {
         flexDirection: "row",
         alignItems: "center",
         paddingRight: 20,
         columnGap: 12,
-    }
+    },
+    trackMenu: {
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
 });

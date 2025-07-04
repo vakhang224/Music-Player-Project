@@ -1,63 +1,71 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
-import { Track } from '@/assets/data/Track';
-import { Ionicons } from '@expo/vector-icons';
+import { unknownTracksImageUri } from "@/constants/images";
+import { useLastActiveTrack } from "@/hooks/useLastActiveTrack";
+import { defaultStyles } from "@/styles";
+import { Image, StyleSheet, Text, TouchableOpacity, View, ViewProps } from "react-native";
+import { useActiveTrack } from "react-native-track-player";
+import { PlayPauseButton, SkipToNextButton } from "./PlayerControl";
 
-type Props = {
-  track: Track;
-  isPlaying: boolean;
-  onPlayPause: () => void;
-  onNext: () => void;
-};
+export const FloatingPlayer = ({ style }: ViewProps) => {
+  const activeTrack = useActiveTrack();
+  const lastActiveTrack = useLastActiveTrack();
 
-export const FloatingPlayer: React.FC<Props> = ({
-  track,
-  isPlaying,
-  onPlayPause,
-  onNext,
-}) => {
+  const displayTrack = activeTrack ?? lastActiveTrack
+
+  if (!displayTrack) return null
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#1e1e1e',
-        borderRadius: 12,
-        margin: 16,
-        padding: 12,
-        position: 'absolute',
-        bottom: 20,
-        left: 0,
-        right: 0,
-        shadowColor: '#000',
-        shadowOpacity: 0.3,
-        shadowOffset: { width: 0, height: 3 },
-        shadowRadius: 6,
-        elevation: 6,
-      }}
-    >
-      <Image
-        source={{ uri: track.artwork }}
-        style={{ width: 48, height: 48, borderRadius: 6, marginRight: 12 }}
-      />
-      <View style={{ flex: 1 }}>
-        <Text style={{ color: 'white', fontWeight: 'bold' }} numberOfLines={1}>
-          {track.title}
-        </Text>
-        <Text style={{ color: '#aaa', fontSize: 12 }} numberOfLines={1}>
-          {track.artist}
-        </Text>
-      </View>
-      <TouchableOpacity onPress={onPlayPause} style={{ marginHorizontal: 10 }}>
-        <Ionicons
-          name={isPlaying ? 'pause' : 'play'}
-          size={24}
-          color="#fff"
+    <TouchableOpacity activeOpacity={0.9} style={[
+      styles.container, style
+    ]}>
+      <>
+        <Image source={{ uri: displayTrack.artwork ?? unknownTracksImageUri }}
+          style={styles.trackArtwork}
         />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={onNext}>
-        <Ionicons name="play-skip-forward" size={24} color="#fff" />
-      </TouchableOpacity>
-    </View>
+
+        <View style={styles.trackTitleContainer}>
+          <Text style={styles.trackTitle}>{displayTrack.title}</Text>
+        </View>
+
+        <View style={styles.trackControl}>
+          <PlayPauseButton iconSize={24} />
+          <SkipToNextButton iconSize={24} />
+        </View>
+      </>
+    </TouchableOpacity>
   );
-};
+}
+
+
+const styles = StyleSheet.create({
+  container:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#252525',
+    padding: 8,
+    borderRadius: 12,
+    paddingVertical: 10,
+    marginBottom: 15
+  },
+  trackArtwork: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+  },
+  trackTitle: {
+    ...defaultStyles.text,
+    fontSize: 18,
+    fontWeight: '600',
+    paddingLeft: 10,
+  },
+  trackTitleContainer: {
+    flex: 1,
+    overflow: 'hidden',
+    marginLeft: 10,
+  },
+  trackControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 20,
+    marginRight: 16,
+    paddingLeft: 16,
+  }
+})

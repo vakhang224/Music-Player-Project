@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import { ScrollView, View, Platform, ActivityIndicator, Text } from "react-native";
-import { Track } from "@/assets/data/Track";
-import { TracksList } from "@/components/TracksList";
 import { SearchBar } from "@/components/SearchBar";
+import { TracksList } from "@/components/TracksList";
 import { colors, fontSize, screenPadding } from "@/constants/tokens";
 import { navigationSearch } from "@/hooks/navigationSearch";
 import { fetchTracks } from "@/services/trackService";
 import { defaultStyles } from "@/styles";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Platform, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Track } from "react-native-track-player";
 
 const SongsScreen = () => {
   const { search, setSearch } = navigationSearch({
@@ -24,8 +24,13 @@ const SongsScreen = () => {
     const loadTracks = async () => {
       try {
         const data = await fetchTracks();
-        setTracks(data);
-        setFilteredTracks(data); // gán luôn cho danh sách lọc
+        // Convert rating to correct type if necessary
+        const mappedData = data.map((track) => ({
+          ...track,
+          rating: track.rating as any, // Cast or map to RatingType if needed
+        }));
+        setTracks(mappedData);
+        setFilteredTracks(mappedData); // gán luôn cho danh sách lọc
       } catch (error) {
         console.error("Error fetching tracks:", error);
       } finally {
@@ -43,7 +48,7 @@ const SongsScreen = () => {
     } else {
       const query = search.toLowerCase();
       const filtered = tracks.filter((track) =>
-        track.title.toLowerCase().includes(query)
+        track.title?.toLowerCase().includes(query)
       );
       setFilteredTracks(filtered);
     }
@@ -56,7 +61,7 @@ const SongsScreen = () => {
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: screenPadding.horizontal,
-          paddingBottom: 100, // Add some padding so it can scroll above tab bar
+          paddingBottom: 160, // Add some padding so it can scroll above tab bar
         }}
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
