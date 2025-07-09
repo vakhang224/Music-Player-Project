@@ -1,11 +1,11 @@
-
 import { unknownTracksImageUri } from "@/constants/images";
 import { colors, fontSize } from "@/constants/tokens";
 import { defaultStyles } from "@/styles";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableHighlight, View } from "react-native";
-import { Track, useActiveTrack } from "react-native-track-player";
+import LoaderKit from "react-native-loader-kit";
+import { Track, useActiveTrack, useIsPlaying } from "react-native-track-player";
 
 export type Props = {
     tracks: Track;
@@ -13,6 +13,7 @@ export type Props = {
 }
 
 export const TracksListItem = ({ tracks, onTrackSelected: handleTrackSelect }: Props) => {
+    const { playing } = useIsPlaying();
     const isActiveTrack = useActiveTrack()?.url === tracks.url;
     return (
         <TouchableHighlight onPress={() => handleTrackSelect(tracks)}>
@@ -27,6 +28,12 @@ export const TracksListItem = ({ tracks, onTrackSelected: handleTrackSelect }: P
                             opacity: isActiveTrack ? 0.6 : 1,
                         }}
                     />
+
+                    {isActiveTrack && (
+                        playing 
+                        ? <LoaderKit style={styles.trackPlayingIcon} name='LineScaleParty' color={colors.icon} /> 
+                        : <Ionicons style={styles.trackPlayingIcon} name='play' size={18} color={colors.icon} />
+                    )}
                 </View>
                 <View style={styles.trackMenu}>
                     <View style={{ width: '100%' }}>
@@ -85,4 +92,11 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
     },
+    trackPlayingIcon:{
+        position:'absolute',
+        top:18,
+        left:18,
+        right:16,
+        height:16,
+    }
 });

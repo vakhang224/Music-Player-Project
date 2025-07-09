@@ -1,5 +1,5 @@
 import { utilsStyles } from "@/styles";
-import { FlatList, FlatListProps, View } from "react-native";
+import { FlatList, FlatListProps, Text, View } from "react-native";
 import TrackPlayer, { Track } from "react-native-track-player";
 import { TracksListItem } from "./TracksListItem";
 
@@ -14,11 +14,11 @@ export type Props = Partial<FlatListProps<Track>> & {
 
 export const TracksList = ({ tracks }: Props) => {
 
-const handleTrackSelect = async (track: Track) => {
-    await TrackPlayer.load(track)
-    await TrackPlayer.play();
-    console.log(track)
-}
+    const handleTrackSelect = async (track: Track) => {
+        await TrackPlayer.load(track)
+        await TrackPlayer.play();
+        console.log(track)
+    }
 
     return (
         <FlatList
@@ -28,6 +28,11 @@ const handleTrackSelect = async (track: Track) => {
                 <TracksListItem tracks={track} onTrackSelected={handleTrackSelect}/>
             )}
             scrollEnabled={false}
+            ListEmptyComponent={
+                <View>
+                    <Text style={utilsStyles.emptyComponentText}>No song match your search</Text>
+                </View>
+            }
         />
     );
 };
